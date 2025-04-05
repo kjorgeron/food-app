@@ -254,7 +254,7 @@ class BudgetScreen(Screen):
         with self.canvas.before:
             self.rect = Rectangle(source="images/budget_background.png")
         self.bind(pos=self.update_rect, size=self.update_rect)
-        actions = CustomActionBar(orientation="horizontal")
+        actions = CustomActionBar(size_hint=(1, None), height=80)
         budget_btn = CustomButton(text="Budget")
         budget_btn.bind(on_press=self.budget_page)
         recipe_btn = CustomButton(text="Recipes")
@@ -286,7 +286,7 @@ class GroceryScreen(Screen):
         with self.canvas.before:
             self.rect = Rectangle(source="images/grocery_background.jpeg")
         self.bind(pos=self.update_rect, size=self.update_rect)
-        actions = CustomActionBar(orientation="horizontal")
+        actions = CustomActionBar(size_hint=(1, None), height=80)
         budget_btn = CustomButton(text="Budget")
         budget_btn.bind(on_press=self.budget_page)
         recipe_btn = CustomButton(text="Recipes")
