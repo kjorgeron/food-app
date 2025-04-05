@@ -165,8 +165,6 @@ class CustomLabel(Label):
 class CustomRecipeBox(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # self.pos_hint = {"center_x": 0.5, "center_y": 0.3}
-        # self.size_hint = (0.8, 0.8)
         rr, gg, bb, aa = item_background
         aa = 0.8
         r, g, b, a = border_color
