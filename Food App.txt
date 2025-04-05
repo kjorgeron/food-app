@@ -1,0 +1,35 @@
+Features:
+
+	1. Takes in a budget
+		a. Amount of money
+		b. How many weeks for
+
+	2. Takes in a check pantry list
+
+	3. Web scrape for local grocery pricing
+		a. Have a list of stores web scraped
+		b. compare prices to send to shopping list
+
+	4. Displays food recipe list
+		a. Custom filters on recipe items
+			aa. Default filter will be what recipe is cheapest
+				- takes pantry items into consideration
+
+	5. Creates shopping list
+		a. List will display what store has cheapest price
+
+Tools:
+
+	1. Database
+	2. Recipe API
+	3. GUI Builder
+		- Kivy
+	4. Web Scraper
+	5. Website
+
+Information Learned:
+
+	1. Users subscribe via website
+	2. Check out legal text file
+	3. 
+	
