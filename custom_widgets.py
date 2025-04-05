@@ -12,6 +12,8 @@ from kivy.uix.widget import Widget
 from kivy.uix.image import Image
 from kivy.graphics import Color, Rectangle, Line, Ellipse, RoundedRectangle
 
+
+# Modern and Minimalist
 border_color = (55 / 255, 71 / 255, 79 / 255, 1)  # Charcoal Gray
 app_background = (236 / 255, 239 / 255, 241 / 255, 1)  # Light Gray
 item_background = (96 / 255, 125 / 255, 139 / 255, 1)  # Steel Blue
@@ -65,8 +67,6 @@ class CustomLoginBoxLayout(BoxLayout):
         self.add_widget(anchor3)
         self.add_widget(BoxLayout())
         self.add_widget(BoxLayout())
-        # self.add_widget(BoxLayout(size_hint=(size), height=100))  # Empty space below
-
         r, g, b, a = self.custom_border
         rr, gg, bb, aa = self.custom_background
         with self.canvas.before:
@@ -140,12 +140,11 @@ class CustomButton(Button):
 
 
 class CustomActionBar(BoxLayout):
-    def __init__(self, orientation, space, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.size_hint = (1, None)
         self.pos_hint = {"top": 1}
-        self.orientation = orientation
-        self.spacing = space
+        self.spacing = 10
         self.padding = (10, 10)
 
 
@@ -161,6 +160,32 @@ class CustomLabel(Label):
     def update_rect(self, *args):
         self.rect.size = self.size
         self.rect.pos = self.pos
+
+
+class CustomRecipeBox(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # self.pos_hint = {"center_x": 0.5, "center_y": 0.3}
+        # self.size_hint = (0.8, 0.8)
+        rr, gg, bb, aa = item_background
+        aa = 0.8
+        r, g, b, a = border_color
+        with self.canvas.before:
+            Color(rr, gg, bb, aa)  # Red background
+            self.rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[20])
+
+            Color(r, g, b, a)  # Black border
+            self.border = Line(
+                rounded_rectangle=(self.x, self.y, self.width, self.height, 20), width=2
+            )
+
+        # Bind resizing method
+        self.bind(pos=self.on_size, size=self.on_size)
+
+    def on_size(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = self.size
+        self.border.rounded_rectangle = (self.x, self.y, self.width, self.height, 20)
 
 
 class SignOnScreen(Screen):
@@ -183,13 +208,15 @@ class SignOnScreen(Screen):
 class RecipeScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
-        self.add_widget(
-            Label(text="You are at the Recipe Screen", font_size=32, color=(0, 0, 0, 1))
-        )
         with self.canvas.before:
             self.rect = Rectangle(source="images/recipes_background.png")
         self.bind(pos=self.update_rect, size=self.update_rect)
-        actions = CustomActionBar(orientation="horizontal", space=10)
+
+        # Outer Layout: Vertical BoxLayout
+        parent_layout = BoxLayout(orientation="vertical")
+
+        # Action bar stays at the top with a fixed height
+        actions = CustomActionBar(size_hint=(1, None), height=80)  # Adjust height as needed
         budget_btn = CustomButton(text="Budget")
         budget_btn.bind(on_press=self.budget_page)
         recipe_btn = CustomButton(text="Recipes")
@@ -199,7 +226,15 @@ class RecipeScreen(Screen):
         actions.add_widget(budget_btn)
         actions.add_widget(recipe_btn)
         actions.add_widget(grocery_btn)
-        self.add_widget(actions)
+        parent_layout.add_widget(actions)
+
+        # Wrapper Layout: FloatLayout to allow pos_hint for CustomRecipeBox
+        wrapper_layout = FloatLayout(size_hint=(1, 1))  # Takes remaining space
+        recipe_box = CustomRecipeBox(size_hint=(0.8, 0.8), pos_hint={"center_x": 0.5, "center_y": 0.5})
+        wrapper_layout.add_widget(recipe_box)
+        parent_layout.add_widget(wrapper_layout)
+
+        self.add_widget(parent_layout)
 
     def update_rect(self, *args):
         self.rect.size = self.size
@@ -218,13 +253,10 @@ class RecipeScreen(Screen):
 class BudgetScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
-        self.add_widget(
-            Label(text="You are at the Budget Screen", font_size=32, color=(0, 0, 0, 1))
-        )
         with self.canvas.before:
-            self.rect = Rectangle(source="images/budget_background1.png")
+            self.rect = Rectangle(source="images/budget_background.png")
         self.bind(pos=self.update_rect, size=self.update_rect)
-        actions = CustomActionBar(orientation="horizontal", space=10)
+        actions = CustomActionBar(orientation="horizontal")
         budget_btn = CustomButton(text="Budget")
         budget_btn.bind(on_press=self.budget_page)
         recipe_btn = CustomButton(text="Recipes")
@@ -253,15 +285,10 @@ class BudgetScreen(Screen):
 class GroceryScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
-        self.add_widget(
-            Label(
-                text="You are at the Grocery Screen", font_size=32, color=(0, 0, 0, 1)
-            )
-        )
         with self.canvas.before:
             self.rect = Rectangle(source="images/grocery_background.jpeg")
         self.bind(pos=self.update_rect, size=self.update_rect)
-        actions = CustomActionBar(orientation="horizontal", space=10)
+        actions = CustomActionBar(orientation="horizontal")
         budget_btn = CustomButton(text="Budget")
         budget_btn.bind(on_press=self.budget_page)
         recipe_btn = CustomButton(text="Recipes")
