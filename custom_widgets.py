@@ -252,7 +252,7 @@ class BudgetScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
         with self.canvas.before:
-            self.rect = Rectangle(source="images/budget_background.png")
+            self.rect = Rectangle(source="images/budget_background.jpeg")
         self.bind(pos=self.update_rect, size=self.update_rect)
         actions = CustomActionBar(size_hint=(1, None), height=80)
         budget_btn = CustomButton(text="Budget")
