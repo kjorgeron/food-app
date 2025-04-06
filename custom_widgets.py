@@ -11,6 +11,8 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.uix.widget import Widget
 from kivy.uix.image import Image
 from kivy.graphics import Color, Rectangle, Line, Ellipse, RoundedRectangle
+from kivy.core.window import Window
+from kivy.uix.relativelayout import RelativeLayout
 
 
 # Modern and Minimalist
@@ -162,28 +164,68 @@ class CustomLabel(Label):
         self.rect.pos = self.pos
 
 
+class CustomRecipeBackground(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        with self.canvas.before:
+            self.rect = Rectangle(
+                source="images/recipes_background.png", size=self.size, pos=self.pos
+            )
+        self.bind(size=self.update_rect, pos=self.update_rect)
+
+    def update_rect(self, *args):  # Corrected method signature
+        self.rect.size = self.size
+        self.rect.pos = self.pos
+
+
 class CustomRecipeBox(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         rr, gg, bb, aa = item_background
         aa = 0.8
         r, g, b, a = border_color
+
+        # Add the actual box elements on top
         with self.canvas.before:
-            Color(rr, gg, bb, aa)  # Red background
+            Color(rr, gg, bb, aa)  # Background overlay (if needed)
             self.rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[20])
 
-            Color(r, g, b, a)  # Black border
+            Color(r, g, b, a)  # Border
             self.border = Line(
                 rounded_rectangle=(self.x, self.y, self.width, self.height, 20), width=2
             )
 
-        # Bind resizing method
-        self.bind(pos=self.on_size, size=self.on_size)
+        # Ensure resizing updates elements correctly
+        self.bind(pos=self.update_elements, size=self.update_elements)
 
-    def on_size(self, *args):
-        self.rect.pos = self.pos
+    def update_elements(self, *args):
         self.rect.size = self.size
+        self.rect.pos = self.pos
         self.border.rounded_rectangle = (self.x, self.y, self.width, self.height, 20)
+
+
+class CustomBudgetBox(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        with self.canvas.before:
+            self.rect = Rectangle(source="images/budget_background.png")
+        self.bind(pos=self.update_rect, size=self.update_rect)
+
+    def update_rect(self, *args):
+        self.rect.size = self.size
+        self.rect.pos = self.pos
+
+
+class CustomGroceryLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        with self.canvas.before:
+            self.rect = Rectangle(source="images/grocery_background.jpeg")
+        self.bind(pos=self.update_rect, size=self.update_rect)
+
+    def update_rect(self, *args):
+        self.rect.size = self.size
+        self.rect.pos = self.pos
 
 
 class SignOnScreen(Screen):
@@ -206,15 +248,11 @@ class SignOnScreen(Screen):
 class RecipeScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
-        with self.canvas.before:
-            self.rect = Rectangle(source="images/recipes_background.png")
-        self.bind(pos=self.update_rect, size=self.update_rect)
-
-        # Outer Layout: Vertical BoxLayout
         parent_layout = BoxLayout(orientation="vertical")
-
         # Action bar stays at the top with a fixed height
-        actions = CustomActionBar(size_hint=(1, None), height=80)  # Adjust height as needed
+        actions = CustomActionBar(
+            size_hint=(1, None), height=80
+        )  # Adjust height as needed
         budget_btn = CustomButton(text="Budget")
         budget_btn.bind(on_press=self.budget_page)
         recipe_btn = CustomButton(text="Recipes")
@@ -228,15 +266,15 @@ class RecipeScreen(Screen):
 
         # Wrapper Layout: FloatLayout to allow pos_hint for CustomRecipeBox
         wrapper_layout = FloatLayout(size_hint=(1, 1))  # Takes remaining space
-        recipe_box = CustomRecipeBox(size_hint=(0.8, 0.8), pos_hint={"center_x": 0.5, "center_y": 0.5})
+        recipe_bg = CustomRecipeBackground()
+        recipe_box = CustomRecipeBox(
+            size_hint=(0.8, 0.8), pos_hint={"center_x": 0.5, "center_y": 0.5}
+        )
+        wrapper_layout.add_widget(recipe_bg)
         wrapper_layout.add_widget(recipe_box)
         parent_layout.add_widget(wrapper_layout)
 
         self.add_widget(parent_layout)
-
-    def update_rect(self, *args):
-        self.rect.size = self.size
-        self.rect.pos = self.pos
 
     def recipe_page(self, instance):
         self.manager.current = "recipes"
@@ -251,9 +289,7 @@ class RecipeScreen(Screen):
 class BudgetScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
-        with self.canvas.before:
-            self.rect = Rectangle(source="images/budget_background.jpeg")
-        self.bind(pos=self.update_rect, size=self.update_rect)
+        parent_layout = BoxLayout(orientation="vertical")
         actions = CustomActionBar(size_hint=(1, None), height=80)
         budget_btn = CustomButton(text="Budget")
         budget_btn.bind(on_press=self.budget_page)
@@ -264,11 +300,13 @@ class BudgetScreen(Screen):
         actions.add_widget(budget_btn)
         actions.add_widget(recipe_btn)
         actions.add_widget(grocery_btn)
-        self.add_widget(actions)
+        parent_layout.add_widget(actions)
 
-    def update_rect(self, *args):
-        self.rect.size = self.size
-        self.rect.pos = self.pos
+        wrapper_layout = FloatLayout()
+        budget_box = CustomBudgetBox(size_hint=(1, 1))
+        wrapper_layout.add_widget(budget_box)
+        parent_layout.add_widget(wrapper_layout)
+        self.add_widget(parent_layout)
 
     def recipe_page(self, instance):
         self.manager.current = "recipes"
@@ -283,9 +321,7 @@ class BudgetScreen(Screen):
 class GroceryScreen(Screen):
     def __init__(self, **kw):
         super().__init__(**kw)
-        with self.canvas.before:
-            self.rect = Rectangle(source="images/grocery_background.jpeg")
-        self.bind(pos=self.update_rect, size=self.update_rect)
+        parent_layout = BoxLayout(orientation="vertical")
         actions = CustomActionBar(size_hint=(1, None), height=80)
         budget_btn = CustomButton(text="Budget")
         budget_btn.bind(on_press=self.budget_page)
@@ -296,11 +332,13 @@ class GroceryScreen(Screen):
         actions.add_widget(budget_btn)
         actions.add_widget(recipe_btn)
         actions.add_widget(grocery_btn)
-        self.add_widget(actions)
+        parent_layout.add_widget(actions)
 
-    def update_rect(self, *args):
-        self.rect.size = self.size
-        self.rect.pos = self.pos
+        wrapper_layout = FloatLayout()
+        grocery_layout = CustomGroceryLayout(size_hint=(1, 1))
+        wrapper_layout.add_widget(grocery_layout)
+        parent_layout.add_widget(wrapper_layout)
+        self.add_widget(parent_layout)
 
     def recipe_page(self, instance):
         self.manager.current = "recipes"
