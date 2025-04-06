@@ -268,7 +268,7 @@ class RecipeScreen(Screen):
         wrapper_layout = FloatLayout(size_hint=(1, 1))  # Takes remaining space
         recipe_bg = CustomRecipeBackground()
         recipe_box = CustomRecipeBox(
-            size_hint=(0.8, 0.8), pos_hint={"center_x": 0.5, "center_y": 0.5}
+            size_hint=(0.8, 0.6), pos_hint={"center_x": 0.5, "center_y": 0.5}
         )
         wrapper_layout.add_widget(recipe_bg)
         wrapper_layout.add_widget(recipe_box)
