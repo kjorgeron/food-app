@@ -16,9 +16,9 @@ from kivy.uix.relativelayout import RelativeLayout
 
 
 # Modern and Minimalist
-border_color = (55 / 255, 71 / 255, 79 / 255, 1)  # Charcoal Gray
-app_background = (236 / 255, 239 / 255, 241 / 255, 1)  # Light Gray
-item_background = (96 / 255, 125 / 255, 139 / 255, 1)  # Steel Blue
+border_color = (55 / 255, 71 / 255, 79 / 255, 1)  # Charcoal Gray css -> #37474F
+app_background = (236 / 255, 239 / 255, 241 / 255, 1)  # Light Gray css -> #ECEFF1
+item_background = (96 / 255, 125 / 255, 139 / 255, 1)  # Steel Blue css -> #607D8B
 
 
 class CustomLoginBoxLayout(BoxLayout):
@@ -227,18 +227,55 @@ class CustomGroceryLayout(BoxLayout):
         self.rect.size = self.size
         self.rect.pos = self.pos
 
+
+class CustomSettingsButton(RelativeLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Define a scale factor for resizing
+        scale_factor = (
+            0.5  # Adjust this to make everything smaller (e.g., 0.5 = half size)
+        )
+
+        # Button
+        self.button = Button(
+            size_hint=(None, None),
+            size=(200 * scale_factor, 100 * scale_factor),  # Resize button
+            pos_hint={"y": 0.03, "right": 0.95},
+        )
+
+        # Remove the grey background of the button
+        self.button.background_normal = ""  # Disable background image
+        self.button.background_down = ""  # Disable pressed background
+        self.button.background_color = (0, 0, 0, 0)  # Fully transparent
+
+        self.add_widget(self.button)
+
+        # Image (aligned with button and resized proportionally)
+        self.image = Image(
+            source="images/settings-normal.png",
+            size_hint=(None, None),
+            size=(200 * scale_factor, 100 * scale_factor),  # Resize image
+            pos=self.button.pos,
+        )
+        self.add_widget(self.image)
+
+        # Bind the image's position to the button's position
+        self.button.bind(pos=self.update_image_position)
+
+    def update_image_position(self, instance, value):
+        self.image.pos = instance.pos
+
+
 class CustomSettingsLayout(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        r, g, b, a = item_background
-        with self.canvas.before:
-            Color(r, g, b, a)
-            self.rect = Rectangle()
-        self.bind(size=self.update_rect, pos=self.update_rect)
+        self.orientation = "vertical"
+        spacer = Widget(size_hint=(1, 1))  # Takes up the remaining space
+        self.add_widget(spacer)
+        settings = CustomSettingsButton()
+        self.add_widget(settings)
 
-    def update_rect(self, *args):
-        self.rect.size = self.size
-        self.rect.pos = self.pos
 
 class SignOnScreen(Screen):
     def __init__(self, **kw):
@@ -287,7 +324,7 @@ class RecipeScreen(Screen):
         parent_layout.add_widget(wrapper_layout)
 
         # Settings Layout
-        settings_layout = CustomSettingsLayout(size_hint=(1, 0.18))
+        settings_layout = CustomSettingsButton()
         wrapper_layout.add_widget(settings_layout)
 
         self.add_widget(parent_layout)
@@ -324,7 +361,7 @@ class BudgetScreen(Screen):
         parent_layout.add_widget(wrapper_layout)
 
         # Settings Layout
-        settings_layout = CustomSettingsLayout(size_hint=(1, 0.18))
+        settings_layout = CustomSettingsLayout(size_hint=(1, 0.2))
         wrapper_layout.add_widget(settings_layout)
 
         self.add_widget(parent_layout)
