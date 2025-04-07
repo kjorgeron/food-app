@@ -227,6 +227,18 @@ class CustomGroceryLayout(BoxLayout):
         self.rect.size = self.size
         self.rect.pos = self.pos
 
+class CustomSettingsLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        r, g, b, a = item_background
+        with self.canvas.before:
+            Color(r, g, b, a)
+            self.rect = Rectangle()
+        self.bind(size=self.update_rect, pos=self.update_rect)
+
+    def update_rect(self, *args):
+        self.rect.size = self.size
+        self.rect.pos = self.pos
 
 class SignOnScreen(Screen):
     def __init__(self, **kw):
@@ -274,6 +286,10 @@ class RecipeScreen(Screen):
         wrapper_layout.add_widget(recipe_box)
         parent_layout.add_widget(wrapper_layout)
 
+        # Settings Layout
+        settings_layout = CustomSettingsLayout(size_hint=(1, 0.18))
+        wrapper_layout.add_widget(settings_layout)
+
         self.add_widget(parent_layout)
 
     def recipe_page(self, instance):
@@ -306,6 +322,11 @@ class BudgetScreen(Screen):
         budget_box = CustomBudgetBox(size_hint=(1, 1))
         wrapper_layout.add_widget(budget_box)
         parent_layout.add_widget(wrapper_layout)
+
+        # Settings Layout
+        settings_layout = CustomSettingsLayout(size_hint=(1, 0.18))
+        wrapper_layout.add_widget(settings_layout)
+
         self.add_widget(parent_layout)
 
     def recipe_page(self, instance):
@@ -338,6 +359,11 @@ class GroceryScreen(Screen):
         grocery_layout = CustomGroceryLayout(size_hint=(1, 1))
         wrapper_layout.add_widget(grocery_layout)
         parent_layout.add_widget(wrapper_layout)
+
+        # Settings Layout
+        settings_layout = CustomSettingsLayout(size_hint=(1, 0.18))
+        wrapper_layout.add_widget(settings_layout)
+
         self.add_widget(parent_layout)
 
     def recipe_page(self, instance):
